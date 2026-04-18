@@ -1,17 +1,32 @@
 ---
-
+const lang = Astro.url.searchParams.get("lang") || "jp";
 ---
 
-<html lang="en">
+<html lang={lang === "en" ? "en" : "ja"}>
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>yuki-labs</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<nav>
+			<a href="?lang=jp">JP</a> |
+			<a href="?lang=en">EN</a>
+		</nav>
+
+		{lang === "jp" ? (
+			<h1>yuki-labs</h1>
+		) : (
+			<h1>yuki-labs</h1>
+		)}
+
+		{lang === "jp" ? (
+			<p>業務を構造化し、データとして扱い、意思決定を支援するシステムを設計しています。</p>
+		) : (
+			<p>Designing systems to structure workflows, manage data, and support decision-making.</p>
+		)}
 	</body>
 </html>
