@@ -1,5 +1,53 @@
 ---
 const lang = Astro.url.searchParams.get("lang") || "jp";
+
+const projects = [
+	{
+		id: 1,
+		jpTitle: "業務ログ可視化",
+		enTitle: "Business Log Visualization",
+		jpDesc: "タスク状態遷移をダッシュボードで可視化。リードタイム計算と滞留中タスク一覧を表示。",
+		enDesc: "Visualize task state transitions on a dashboard. Calculate lead times and display stuck tasks.",
+		skills: "React / Express / Supabase",
+		url: "https://github.com/users/yukilabs-core/projects/2"
+	},
+	{
+		id: 2,
+		jpTitle: "API基盤",
+		enTitle: "API Foundation",
+		jpDesc: "統一された REST API 基盤。JWT 認証、層分離設計、全プロジェクトから呼び出し可能。",
+		enDesc: "Unified REST API foundation. JWT auth, layered architecture, callable from all projects.",
+		skills: "Node.js / Express / JWT / Swagger",
+		url: "https://github.com/users/yukilabs-core/projects/3"
+	},
+	{
+		id: 3,
+		jpTitle: "検索AI / Knowledge DB",
+		enTitle: "Search AI / Knowledge DB",
+		jpDesc: "ベクトル検索による知識検索システム。Cloudflare Workers AI で Embedding 生成。",
+		enDesc: "Knowledge search with vector search. Cloudflare Workers AI for embeddings.",
+		skills: "Astro / pgvector / Cloudflare Workers AI",
+		url: "https://github.com/users/yukilabs-core/projects/4"
+	},
+	{
+		id: 4,
+		jpTitle: "業務データ分析",
+		enTitle: "Business Data Analysis",
+		jpDesc: "Python で Supabase データを分析。ボトルネック検出と改善提案を HTML レポートで出力。",
+		enDesc: "Analyze Supabase data with Python. Detect bottlenecks and suggest improvements.",
+		skills: "Python / Pandas / Plotly",
+		url: "https://github.com/users/yukilabs-core/projects/5"
+	},
+	{
+		id: 5,
+		jpTitle: "判断ログシステム",
+		enTitle: "Decision Log System",
+		jpDesc: "技術判断を記録・管理・分析。システム自体がポートフォリオの説明書になるメタ設計。",
+		enDesc: "Record and analyze technical decisions. The system itself explains the portfolio.",
+		skills: "Astro / Supabase / RLS",
+		url: "https://github.com/users/yukilabs-core/projects/6"
+	}
+];
 ---
 
 <html lang={lang === "en" ? "en" : "ja"}>
@@ -10,6 +58,103 @@ const lang = Astro.url.searchParams.get("lang") || "jp";
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>yuki-labs</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+				background: #fafafa;
+				color: #333;
+				line-height: 1.6;
+			}
+			nav {
+				padding: 20px;
+				text-align: right;
+				border-bottom: 1px solid #ddd;
+			}
+			nav a {
+				margin: 0 10px;
+				text-decoration: none;
+				color: #0066cc;
+				font-weight: 500;
+			}
+			nav a:hover {
+				text-decoration: underline;
+			}
+			header {
+				padding: 60px 20px;
+				text-align: center;
+				background: white;
+				border-bottom: 1px solid #ddd;
+			}
+			h1 {
+				font-size: 2.5em;
+				margin-bottom: 15px;
+				color: #000;
+			}
+			header p {
+				font-size: 1.2em;
+				color: #666;
+				max-width: 600px;
+				margin: 0 auto;
+			}
+			.projects {
+				max-width: 1200px;
+				margin: 60px auto;
+				padding: 0 20px;
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: 30px;
+			}
+			.project-card {
+				background: white;
+				border-radius: 8px;
+				padding: 30px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+				transition: transform 0.2s, box-shadow 0.2s;
+				text-decoration: none;
+				color: inherit;
+				display: flex;
+				flex-direction: column;
+			}
+			.project-card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+			}
+			.project-num {
+				font-size: 2em;
+				font-weight: bold;
+				color: #0066cc;
+				margin-bottom: 10px;
+			}
+			.project-card h3 {
+				font-size: 1.3em;
+				margin-bottom: 10px;
+				color: #000;
+			}
+			.project-card p {
+				color: #666;
+				margin-bottom: 20px;
+				flex-grow: 1;
+			}
+			.project-skills {
+				font-size: 0.9em;
+				color: #999;
+				margin-bottom: 15px;
+				font-family: monospace;
+			}
+			.project-link {
+				color: #0066cc;
+				text-decoration: none;
+				font-weight: 500;
+			}
+			.project-link:hover {
+				text-decoration: underline;
+			}
+		</style>
 	</head>
 	<body>
 		<nav>
@@ -17,16 +162,30 @@ const lang = Astro.url.searchParams.get("lang") || "jp";
 			<a href="?lang=en">EN</a>
 		</nav>
 
-		{lang === "jp" ? (
-			<h1>yuki-labs</h1>
-		) : (
-			<h1>yuki-labs</h1>
-		)}
+		<header>
+			{lang === "jp" ? (
+				<>
+					<h1>yuki-labs</h1>
+					<p>業務を構造化し、データとして扱い、意思決定を支援するシステムを設計しています。</p>
+				</>
+			) : (
+				<>
+					<h1>yuki-labs</h1>
+					<p>Designing systems to structure workflows, manage data, and support decision-making.</p>
+				</>
+			)}
+		</header>
 
-		{lang === "jp" ? (
-			<p>業務を構造化し、データとして扱い、意思決定を支援するシステムを設計しています。</p>
-		) : (
-			<p>Designing systems to structure workflows, manage data, and support decision-making.</p>
-		)}
+		<div class="projects">
+			{projects.map(project => (
+				<a href={project.url} class="project-card" target="_blank" rel="noopener noreferrer">
+					<div class="project-num">#{project.id}</div>
+					<h3>{lang === "jp" ? project.jpTitle : project.enTitle}</h3>
+					<p>{lang === "jp" ? project.jpDesc : project.enDesc}</p>
+					<div class="project-skills">{project.skills}</div>
+					<div class="project-link">→ GitHub Projects</div>
+				</a>
+			))}
+		</div>
 	</body>
 </html>
