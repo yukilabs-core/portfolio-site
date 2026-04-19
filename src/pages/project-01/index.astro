@@ -261,56 +261,48 @@ const t = texts[lang === "en" ? "en" : "jp"];
     </div>
 
     <script define:vars={{ lang, t }}>
-      import { createClient } from "@supabase/supabase-js";
-
-      const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
-      const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-
-      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+      const API_SERVER_URL = import.meta.env.PUBLIC_API_SERVER_URL;
 
       async function loadDashboard() {
         try {
-          const { data: tasks, error: tasksError } = await supabase
-            .from("tasks")
-            .select("*, task_statuses(name, code, is_terminal, color)")
-            .eq("is_deleted", false)
-            .order("created_at", { ascending: false });
+          // Fetch tasks from API
+          const tasksRes = await fetch(`${API_SERVER_URL}/api/tasks`);
+          if (!tasksRes.ok) throw new Error(`Tasks API error: ${tasksRes.status}`);
+          const tasksData = await tasksRes.json();
+          const tasks = tasksData.data || [];
 
-          if (tasksError) throw tasksError;
+          // Fetch dashboard stats from API
+          const statsRes = await fetch(`${API_SERVER_URL}/api/dashboard/stats`);
+          if (!statsRes.ok) throw new Error(`Stats API error: ${statsRes.status}`);
+          const statsData = await statsRes.json();
+          const stats = statsData.data || {};
 
-          const { data: statuses, error: statusError } = await supabase
-            .from("task_statuses")
-            .select("*")
-            .order("sort_order");
+          // Group tasks by status for the status list view
+          const statuses = tasks.reduce((acc, task) => {
+            const status = task.task_statuses;
+            if (status && !acc.find(s => s.id === status.id)) {
+              acc.push(status);
+            }
+            return acc;
+          }, []).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
-          if (statusError) throw statusError;
-
-          renderDashboard(tasks, statuses);
+          renderDashboard(tasks, statuses, stats);
         } catch (error) {
           const contentDiv = document.getElementById("content");
           contentDiv.innerHTML = `<div class="error">${t.error}: ${error.message}</div>`;
         }
       }
 
-      function renderDashboard(tasks, statuses) {
+      function renderDashboard(tasks, statuses, stats) {
         const contentDiv = document.getElementById("content");
 
-        // Calculate stats
-        const completedTasks = tasks.filter(t => t.task_statuses?.is_terminal);
-        const completionRate = tasks.length > 0
-          ? Math.round((completedTasks.length / tasks.length) * 100)
+        // Use stats from API, with fallback calculation
+        const totalTasks = stats.total_tasks || tasks.length;
+        const completionRate = stats.completion_rate !== undefined
+          ? parseFloat(stats.completion_rate)
           : 0;
-
-        const leadTimes = completedTasks
-          .filter(t => t.created_at && t.closed_at)
-          .map(t => {
-            const created = new Date(t.created_at);
-            const closed = new Date(t.closed_at);
-            return (closed - created) / (1000 * 60 * 60 * 24);
-          });
-
-        const avgLeadTime = leadTimes.length > 0
-          ? (leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length).toFixed(1)
+        const avgLeadTime = stats.average_lead_time_days !== undefined
+          ? parseFloat(stats.average_lead_time_days)
           : 0;
 
         // Find stuck tasks (non-terminal, updated > 2 days ago)
@@ -324,7 +316,7 @@ const t = texts[lang === "en" ? "en" : "jp"];
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-label">${t.totalTasks}</div>
-              <div class="stat-value">${tasks.length}</div>
+              <div class="stat-value">${totalTasks}</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">${t.completionRate}</div>
@@ -332,7 +324,7 @@ const t = texts[lang === "en" ? "en" : "jp"];
             </div>
             <div class="stat-card">
               <div class="stat-label">${t.avgLeadTime}</div>
-              <div class="stat-value">${avgLeadTime}<span class="stat-unit">${t.days}</span></div>
+              <div class="stat-value">${Number(avgLeadTime).toFixed(1)}<span class="stat-unit">${t.days}</span></div>
             </div>
           </div>
         `;
