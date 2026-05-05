@@ -1,0 +1,305 @@
+---
+const lang = Astro.url.searchParams.get("lang") || "jp";
+
+const texts = {
+  jp: {
+    title: "API基盤",
+    subtitle: "統一された REST API 基盤。JWT 認証、層分離設計",
+    back: "← ポートフォリオに戻る",
+    tech: "技術スタック",
+    features: "機能",
+    endpoints: "主要エンドポイント",
+    github: "→ GitHub",
+  },
+  en: {
+    title: "API Foundation",
+    subtitle: "Unified REST API foundation with JWT auth and layered architecture",
+    back: "← Back to Portfolio",
+    tech: "Tech Stack",
+    features: "Features",
+    endpoints: "Key Endpoints",
+    github: "→ GitHub",
+  },
+};
+
+const t = texts[lang === "en" ? "en" : "jp"];
+
+const apiEndpoints = [
+  { method: "GET", path: "/api/tasks", desc: lang === "en" ? "Fetch all tasks" : "全タスク取得" },
+  { method: "GET", path: "/api/dashboard/stats", desc: lang === "en" ? "Dashboard statistics" : "ダッシュボード統計" },
+  { method: "POST", path: "/api/auth/login", desc: lang === "en" ? "User login (JWT)" : "ユーザーログイン" },
+  { method: "POST", path: "/api/tasks", desc: lang === "en" ? "Create new task" : "新規タスク作成" },
+  { method: "PATCH", path: "/api/tasks/:id", desc: lang === "en" ? "Update task" : "タスク更新" },
+];
+---
+
+<html lang={lang === "en" ? "en" : "ja"}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{t.title} - yuki-labs</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #fafafa;
+        color: #333;
+        line-height: 1.6;
+      }
+      nav {
+        padding: 20px;
+        text-align: right;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      nav a {
+        margin: 0 10px;
+        text-decoration: none;
+        color: #0066cc;
+        font-weight: 500;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      .nav-left a {
+        color: #666;
+      }
+      .nav-right {
+        display: flex;
+        gap: 10px;
+      }
+      header {
+        padding: 40px 20px;
+        text-align: center;
+        background: white;
+        border-bottom: 1px solid #ddd;
+      }
+      h1 {
+        font-size: 2em;
+        margin-bottom: 10px;
+        color: #000;
+      }
+      header p {
+        font-size: 1.1em;
+        color: #666;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      section {
+        margin-bottom: 40px;
+      }
+      h2 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+        color: #000;
+        border-bottom: 2px solid #0066cc;
+        padding-bottom: 10px;
+      }
+      .tech-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .tech-item {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .tech-item strong {
+        display: block;
+        color: #0066cc;
+        margin-bottom: 5px;
+      }
+      .features-list {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .features-list ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      .features-list li {
+        padding: 10px 0;
+        padding-left: 30px;
+        position: relative;
+      }
+      .features-list li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #0066cc;
+        font-weight: bold;
+      }
+      .endpoints-table {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      thead {
+        background: #f5f5f5;
+        border-bottom: 2px solid #ddd;
+      }
+      th {
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+      }
+      td {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: #f9f9f9;
+      }
+      .method-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 0.85em;
+      }
+      .method-get {
+        background: #d4edda;
+        color: #155724;
+      }
+      .method-post {
+        background: #cce5ff;
+        color: #004085;
+      }
+      .method-patch {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .links {
+        display: flex;
+        gap: 20px;
+        margin-top: 30px;
+      }
+      .link-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: #0066cc;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+      }
+      .link-btn:hover {
+        background: #0052a3;
+      }
+      .link-btn.secondary {
+        background: #666;
+      }
+      .link-btn.secondary:hover {
+        background: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-left">
+        <a href="/?lang={lang}">{t.back}</a>
+      </div>
+      <div class="nav-right">
+        <a href="?lang=jp">JP</a> |
+        <a href="?lang=en">EN</a>
+      </div>
+    </nav>
+
+    <header>
+      <h1>{t.title}</h1>
+      <p>{t.subtitle}</p>
+    </header>
+
+    <div class="container">
+      <section>
+        <h2>{t.tech}</h2>
+        <div class="tech-items">
+          <div class="tech-item">
+            <strong>Node.js / Express</strong>
+            REST API フレームワーク
+          </div>
+          <div class="tech-item">
+            <strong>Supabase</strong>
+            PostgreSQL + Auth
+          </div>
+          <div class="tech-item">
+            <strong>JWT</strong>
+            セキュア認証
+          </div>
+          <div class="tech-item">
+            <strong>Swagger UI</strong>
+            API ドキュメント
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>{t.features}</h2>
+        <div class="features-list">
+          <ul>
+            <li>{lang === "en" ? "Layer-separated architecture (Controllers, Services, Repositories)" : "層分離設計（Controllers, Services, Repositories）"}</li>
+            <li>{lang === "en" ? "JWT-based authentication & authorization" : "JWT ベースの認証・認可"}</li>
+            <li>{lang === "en" ? "Swagger API documentation" : "Swagger API ドキュメンテーション"}</li>
+            <li>{lang === "en" ? "CORS support for cross-origin requests" : "CORS 対応"}</li>
+            <li>{lang === "en" ? "Database migrations & versioning" : "データベースマイグレーション対応"}</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>{t.endpoints}</h2>
+        <div class="endpoints-table">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 80px;">Method</th>
+                <th>Endpoint</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {apiEndpoints.map(ep => (
+                <tr>
+                  <td><span class="method-badge method-{ep.method.toLowerCase()}">{ep.method}</span></td>
+                  <td style="font-family: monospace;">{ep.path}</td>
+                  <td>{ep.desc}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div class="links">
+          <a href="https://github.com/yukilabs-core/api-server" target="_blank" rel="noopener noreferrer" class="link-btn">{t.github}</a>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

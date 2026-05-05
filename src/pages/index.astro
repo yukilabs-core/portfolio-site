@@ -178,12 +178,12 @@ const projects = [
 
 		<div class="projects">
 			{projects.map(project => (
-				<a href={project.url} class="project-card" target="_blank" rel="noopener noreferrer">
+				<a href={`/project-0${project.id}/?lang=${lang}`} class="project-card">
 					<div class="project-num">#{project.id}</div>
 					<h3>{lang === "jp" ? project.jpTitle : project.enTitle}</h3>
 					<p>{lang === "jp" ? project.jpDesc : project.enDesc}</p>
 					<div class="project-skills">{project.skills}</div>
-					<div class="project-link">→ GitHub Projects</div>
+					<div class="project-link">→ 詳細を見る</div>
 				</a>
 			))}
 		</div>
